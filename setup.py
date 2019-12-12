@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TPUCameraManager", # Replace with your own username
-    version="0.0.6",
+    version="0.0.8",
     author="Devin Willis",
     author_email="gatordevin@gmail.com",
     description="A package for camera streams on the google coral",

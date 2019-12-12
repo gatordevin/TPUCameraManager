@@ -2,6 +2,12 @@ from . import gstreamer
 import threading
 import enum
 import numpy as np
+Size = collections.namedtuple('Size', ('width', 'height'))
+Size.__mul__ = lambda self, arg: Size(int(arg * self.width), int(arg * self.height))
+Size.__rmul__ = lambda self, arg: Size(int(arg * self.width), int(arg * self.height))
+Size.__floordiv__ = lambda self, arg: Size(self.width // arg, self.height // arg)
+Size.__truediv__ = lambda self, arg: Size(int(self.width / arg), int(self.height / arg))
+Size.__str__ = lambda self: '%dx%d' % self
 class CameraManager:
     def __init__(self):
         self.camClasses = []
@@ -24,11 +30,17 @@ class Cam:
         self.thread.start()
         self.data = None
         self.newdata = False
-        
+        self.listeners = []
+    
     def on_buffer(self, data, _):
         self.data = data
         self.newdata = True
-    
+        for listener in self.listeners:
+            listener.write(self.data)
+
+    def addListener(self,obj):
+        self.listeners.append(obj)
+
     def getImage(self):
         if self.streamType is GStreamerPipelines.RGB:
             self.newdata = False

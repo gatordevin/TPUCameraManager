@@ -1,6 +1,6 @@
 # TPUCameraManager
 
-'''
+```
 from TPUCameraManager.TPUCameraManager import CameraManager, GStreamerPipelines
 import time
 camMan = CameraManager() #Creates new camera manager object
@@ -14,4 +14,4 @@ while True:
         image = cam2.getImage() #CAN ONLY BE USED ON RGB IMAGE
         imageBytes = cam2.data #Used on H264 bytes stream
         print(image.shape)
-'''
+```

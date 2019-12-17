@@ -173,16 +173,16 @@ def get_seek_element(pipeline):
 def pull_sample(sink):
     sample = sink.emit('pull-sample')
     buf = sample.get_buffer()
-
     result, mapinfo = buf.map(Gst.MapFlags.READ)
     if result:
         yield sample, mapinfo.data
     buf.unmap(mapinfo)
 
-def new_sample_callback(process):
+def new_sample_callback(process,streamName):
     def callback(sink, pipeline):
         with pull_sample(sink) as (sample, data):
-            process(data, caps_size(sample.get_caps()))
+            #print(data)
+            process(data, streamName)
         return Gst.FlowReturn.OK
     return callback
 
@@ -272,7 +272,7 @@ def file_pipline(is_image, filename, layout, display):
 def quit():
     Gtk.main_quit()
 
-def run_pipeline(source,on_buffer):
+def run_pipeline(source,on_buffer,signals):
     # Create pipeline
     pipeline = source
     pipeline = Gst.parse_launch(pipeline)
@@ -283,8 +283,7 @@ def run_pipeline(source,on_buffer):
     bus.connect('message', on_bus_message, pipeline, False)
 
     with Worker(save_frame) as images:
-        signals = {'appsink':{'new-sample': new_sample_callback(on_buffer),'eos' : on_sink_eos},'h264sink': {'new-sample': new_sample_callback(on_buffer)}}
-
+        
         for name, signals in signals.items():
             component = pipeline.get_by_name(name)
             if component:
